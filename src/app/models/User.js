@@ -20,13 +20,20 @@ const UserSchema = new mongoose.Schema(
     avatar: String
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+      virtuals: true
+    }
   }
 )
 
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
   this.password = await bcrypt.hash(this.password, 8)
+})
+
+UserSchema.virtual('avatar_url').get(function () {
+  return `${process.env.APP_URL}/files/${this.avatar}`
 })
 
 module.exports = mongoose.model('User', UserSchema)

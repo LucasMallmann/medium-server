@@ -1,3 +1,6 @@
+const mongoose = require('mongoose')
+const isValidId = mongoose.Types.ObjectId.isValid
+
 const Post = require('../models/Post')
 
 class PostController {
@@ -36,6 +39,21 @@ class PostController {
     })
 
     return res.status(201).json(post)
+  }
+
+  async show (req, res) {
+    const { id } = req.params
+    const post = await Post.findById(id).populate('author')
+    return res.status(200).json(post)
+  }
+
+  async destroy (req, res) {
+    const { id } = req.params
+    if (!isValidId(id)) {
+      return res.status(404).json({ error: 'The id provided is not valid' })
+    }
+    await Post.findByIdAndRemove(id)
+    res.send()
   }
 }
 module.exports = new PostController()
