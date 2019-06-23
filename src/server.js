@@ -10,7 +10,6 @@ const databaseConfig = require('./config/database')
 class App {
   constructor () {
     this.express = express()
-    this.isDev = process.env.NODE_ENV === 'development'
     this.database()
     this.middlewares()
     this.routes()
@@ -42,14 +41,8 @@ class App {
         return res.status(err.status).json(err)
       }
 
-      if (this.isDev) {
-        const youch = new Youch(err, req)
-        return res.json(await youch.toJSON())
-      }
-
-      return res
-        .status(err.status || 500)
-        .json({ error: 'Internal Server Error' })
+      const youch = new Youch(err, req)
+      return res.json(await youch.toJSON())
     })
   }
 }
